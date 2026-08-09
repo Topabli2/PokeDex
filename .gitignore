@@ -1,0 +1,27 @@
+# Crear .gitignore
+cat > .gitignore << 'EOF'
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.uv/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+EOF
+
+# Remover __pycache__ de Git (no borra el archivo local, solo deja de trackearlo)
+git rm -r --cached ms-pokedex/app/__pycache__
+
+# Commit inmediato
+git add .gitignore
+git commit -m "chore: agregar .gitignore y remover __pycache__ del tracking"
