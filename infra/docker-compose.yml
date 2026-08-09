@@ -1,0 +1,19 @@
+name: pokedex
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "uv", "run", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    environment:
+      - APP_ENV=development
+    restart: unless-stopped
