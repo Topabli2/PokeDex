@@ -1,12 +1,21 @@
 name: pokedex
 
 services:
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # SERVICIO 1: API BACKEND
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   api:
     build:
       context: ..
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql+asyncpg://pokedex:${DB_PASSWORD:-devpassword123}@db:5432/pokedex
+    depends_on:
+      db:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "uv", "run", "python", "-c",
              "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -14,6 +23,28 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
-    environment:
-      - APP_ENV=development
     restart: unless-stopped
+
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # SERVICIO 2: POSTGRESQL (al mismo nivel que api)
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: pokedex
+      POSTGRES_USER: pokedex
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-devpassword123}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pokedex -d pokedex"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# VOLÚMENES NOMBRADOS (fuera de services)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+volumes:
+  pgdata:
