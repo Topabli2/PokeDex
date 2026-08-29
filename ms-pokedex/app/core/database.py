@@ -1,6 +1,37 @@
 from datetime import datetime
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from app.core.config import settings
+
+
+# ============================================================================
+# CONEXIÓN A LA BASE DE DATOS
+# ============================================================================
+
+# El "puente" hacia PostgreSQL. echo=True imprime el SQL en consola (útil aprendiendo)
+engine = create_async_engine(
+    settings.database_url,
+    echo=settings.app_env == "development",
+    echo=True
+)
+
+# Fábrica de sesiones. Versión 2.0 de lo que tu amigo escribió con sessionmaker()
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False,  # los objetos siguen usables tras el commit (clave en APIs)
+)
+
+
+async def get_db():
+    """
+    Dependency de FastAPI: presta una sesión por petición y la cierra al terminar.
+    Se usará así en los routers:  db: AsyncSession = Depends(get_db)
+    """
+    async with AsyncSessionLocal() as session:
+        yield session
 
 class Base(DeclarativeBase):
     """
