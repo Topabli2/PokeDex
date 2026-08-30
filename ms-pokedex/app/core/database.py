@@ -14,7 +14,6 @@ from app.core.config import settings
 engine = create_async_engine(
     settings.database_url,
     echo=settings.app_env == "development",
-    echo=True
 )
 
 # Fábrica de sesiones. Versión 2.0 de lo que tu amigo escribió con sessionmaker()

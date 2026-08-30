@@ -10,5 +10,9 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://pokedex:devpassword123@localhost:5432/pokedex"
     app_env: str = "development"
 
+    # JWT: clave para firmar/verificar tokens y tiempo de expiración
+    secret_key: str = "dev-secret-change-me"
+    access_token_expire_minutes: int = 60
+
 
 settings = Settings()

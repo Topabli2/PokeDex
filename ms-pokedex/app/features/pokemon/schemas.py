@@ -19,7 +19,6 @@ class PokemonUpdate(BaseModel):
 class PokemonRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
     pokeapi_id: int
     name: str
     types: list[str] | None
@@ -31,6 +30,6 @@ class PokemonRead(BaseModel):
 class PokemonSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    pokeapi_id: int
     name: str
     photo_url: str | None
